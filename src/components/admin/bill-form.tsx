@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useMemo, useState } from "react";
+import { useActionState, useMemo, useState, type KeyboardEvent } from "react";
 import Link from "next/link";
 import { createBill, updateBill } from "@/lib/actions/bills";
 import { formatBaht } from "@/lib/utils";
@@ -9,7 +9,7 @@ import type { Product } from "@/lib/types";
 
 type SellProduct = Pick<
   Product,
-  "id" | "name_th" | "sku" | "sale_price" | "quantity" | "unit"
+  "id" | "name_th" | "sku" | "barcode" | "sale_price" | "quantity" | "unit"
 >;
 
 interface Line {
@@ -52,7 +52,7 @@ export function BillForm({
     [products]
   );
 
-  // Filter the product list by Thai name or SKU as the user types.
+  // Filter the product list by Thai name, SKU or barcode as the user types.
   const matches = useMemo(() => {
     const q = query.trim().toLowerCase();
     const list =
@@ -61,7 +61,8 @@ export function BillForm({
         : products.filter(
             (p) =>
               p.name_th.toLowerCase().includes(q) ||
-              (p.sku ?? "").toLowerCase().includes(q)
+              (p.sku ?? "").toLowerCase().includes(q) ||
+              (p.barcode ?? "").toLowerCase().includes(q)
           );
     return list.slice(0, 8);
   }, [query, products]);
@@ -73,22 +74,46 @@ export function BillForm({
     setOpen(false);
   };
 
-  const addLine = () => {
-    if (!selProduct || selQty < 1) return;
+  // Add a product to the bill (merging quantity if it's already a line).
+  const addProduct = (p: SellProduct, qty: number) => {
+    if (p.quantity <= 0 || qty < 1) return;
     setLines((prev) => {
-      const existing = prev.find((l) => l.product_id === selProduct);
+      const existing = prev.find((l) => l.product_id === p.id);
       if (existing) {
         return prev.map((l) =>
-          l.product_id === selProduct
-            ? { ...l, quantity: l.quantity + selQty }
-            : l
+          l.product_id === p.id ? { ...l, quantity: l.quantity + qty } : l
         );
       }
-      return [...prev, { product_id: selProduct, quantity: selQty }];
+      return [...prev, { product_id: p.id, quantity: qty }];
     });
     setSelProduct("");
     setSelQty(1);
     setQuery("");
+  };
+
+  const addLine = () => {
+    const p = byId.get(selProduct);
+    if (p) addProduct(p, selQty);
+  };
+
+  // Barcode scanners type the code then send Enter. Intercept Enter so it never
+  // submits the form: on an exact barcode/SKU match (or a single filtered
+  // result) add the product straight to the bill, ready for the next scan.
+  const onSearchKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    const q = query.trim().toLowerCase();
+    if (q === "") return;
+    const exact = products.find(
+      (p) =>
+        (p.barcode ?? "").toLowerCase() === q ||
+        (p.sku ?? "").toLowerCase() === q
+    );
+    const target = exact ?? (matches.length === 1 ? matches[0] : null);
+    if (target) {
+      addProduct(target, selQty);
+      setOpen(false);
+    }
   };
 
   const setQty = (pid: string, q: number) =>
@@ -119,7 +144,7 @@ export function BillForm({
           <Input
             id="pick"
             autoComplete="off"
-            placeholder="พิมพ์ชื่อสินค้า หรือ SKU เพื่อค้นหา…"
+            placeholder="พิมพ์ชื่อสินค้า SKU หรือยิงบาร์โค้ด…"
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
@@ -128,6 +153,7 @@ export function BillForm({
             }}
             onFocus={() => setOpen(true)}
             onBlur={() => setTimeout(() => setOpen(false), 150)}
+            onKeyDown={onSearchKeyDown}
           />
           {open && matches.length > 0 && (
             <ul className="absolute z-20 mt-1 max-h-72 w-full overflow-auto rounded-lg border border-slate-200 bg-white shadow-lg">
@@ -150,9 +176,9 @@ export function BillForm({
                         <span className="block truncate font-medium">
                           {p.name_th}
                         </span>
-                        {p.sku && (
+                        {(p.sku || p.barcode) && (
                           <span className="block truncate text-xs text-slate-400">
-                            {p.sku}
+                            {[p.sku, p.barcode].filter(Boolean).join(" · ")}
                           </span>
                         )}
                       </span>

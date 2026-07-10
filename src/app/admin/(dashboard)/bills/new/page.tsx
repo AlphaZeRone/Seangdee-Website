@@ -8,14 +8,14 @@ export const metadata = { title: "ออกบิลใหม่ — Seangdee Ad
 
 type SellProduct = Pick<
   Product,
-  "id" | "name_th" | "sku" | "sale_price" | "quantity" | "unit"
+  "id" | "name_th" | "sku" | "barcode" | "sale_price" | "quantity" | "unit"
 >;
 
 export default async function NewBillPage() {
   const supabase = await createClient();
   const { data: products } = await supabase
     .from("products")
-    .select("id, name_th, sku, sale_price, quantity, unit")
+    .select("id, name_th, sku, barcode, sale_price, quantity, unit")
     .eq("status", "active")
     .order("name_th");
 

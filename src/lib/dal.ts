@@ -27,6 +27,7 @@ export const requireStaff = cache(async () => {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // Not signed in at all → the admin login page.
   if (!user) redirect("/admin/login");
 
   const { data: profile } = await supabase
@@ -35,8 +36,11 @@ export const requireStaff = cache(async () => {
     .eq("id", user.id)
     .single<Profile>();
 
+  // Signed in but NOT staff (e.g. a customer) → send home, NOT back to the admin
+  // login page. Bouncing them to /admin/login would loop forever, because the
+  // proxy redirects an authenticated user off the login page back into /admin.
   if (!profile || (profile.role !== "admin" && profile.role !== "staff")) {
-    redirect("/admin/login");
+    redirect("/");
   }
 
   return { user, profile };

@@ -9,7 +9,7 @@ export const metadata = { title: "แก้ไขบิล — Seangdee Admin" }
 
 type SellProduct = Pick<
   Product,
-  "id" | "name_th" | "sku" | "sale_price" | "quantity" | "unit"
+  "id" | "name_th" | "sku" | "barcode" | "sale_price" | "quantity" | "unit"
 >;
 
 export default async function EditBillPage({
@@ -38,7 +38,7 @@ export default async function EditBillPage({
 
   const { data: productsData } = await supabase
     .from("products")
-    .select("id, name_th, sku, sale_price, quantity, unit")
+    .select("id, name_th, sku, barcode, sale_price, quantity, unit")
     .eq("status", "active")
     .order("name_th");
   const products = (productsData as SellProduct[]) ?? [];
@@ -52,6 +52,7 @@ export default async function EditBillPage({
         id: it.product_id,
         name_th: it.name,
         sku: it.sku ?? "",
+        barcode: null,
         sale_price: it.unit_price,
         quantity: it.quantity, // best-effort; server re-checks real stock
         unit: "",

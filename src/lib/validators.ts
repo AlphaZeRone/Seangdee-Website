@@ -5,6 +5,18 @@ export const loginSchema = z.object({
   password: z.string().min(1, { error: "กรุณากรอกรหัสผ่าน" }),
 });
 
+/** Customer self-registration on the public site. */
+export const customerSignupSchema = z.object({
+  full_name: z.string().trim().min(1, { error: "กรุณากรอกชื่อ-นามสกุล" }),
+  email: z.email({ error: "กรุณากรอกอีเมลให้ถูกต้อง" }).trim(),
+  password: z
+    .string()
+    .min(8, { error: "รหัสผ่านอย่างน้อย 8 ตัวอักษร" }),
+});
+
+/** Customer login reuses the email+password shape. */
+export const customerLoginSchema = loginSchema;
+
 export const productSchema = z.object({
   sku: z.string().min(1, { error: "กรุณากรอก SKU" }).trim(),
   name_th: z.string().min(1, { error: "กรุณากรอกชื่อสินค้า (ไทย)" }).trim(),

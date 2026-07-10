@@ -37,11 +37,20 @@ export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isAdminArea = pathname.startsWith("/admin");
   const isLoginPage = pathname === "/admin/login";
+  const isAccountArea = pathname.startsWith("/account");
 
   // Not signed in and trying to reach a protected admin page → send to login.
   if (isAdminArea && !isLoginPage && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin/login";
+    url.searchParams.set("next", pathname);
+    return NextResponse.redirect(url);
+  }
+
+  // Customer account area: not signed in → the customer login page.
+  if (isAccountArea && !user) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
     url.searchParams.set("next", pathname);
     return NextResponse.redirect(url);
   }
