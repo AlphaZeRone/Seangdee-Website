@@ -16,7 +16,7 @@ export default function SiteLayout({
           <div>
             <p className="text-lg font-bold text-slate-900">แสงดี · Seangdee</p>
             <p className="mt-1 text-sm text-slate-500">
-              ร้านจำหน่ายและติดตั้งกล้องวงจรปิด พร้อมบริการอินเทอร์เน็ต
+              ร้านจำหน่ายกล้องวงจรปิดและอุปกรณ์อินเทอร์เน็ต
             </p>
           </div>
           <div className="text-sm text-slate-500 md:text-right">
