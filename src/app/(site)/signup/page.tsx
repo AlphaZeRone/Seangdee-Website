@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/dal";
 import { SignupForm } from "@/components/site/signup-form";
+import { PhoneSignupForm } from "@/components/site/phone-signup-form";
+import { AuthTabs } from "@/components/site/auth-tabs";
 
 export const metadata = { title: "สมัครสมาชิก — Seangdee" };
 
@@ -15,7 +17,7 @@ export default async function SignupPage() {
         สร้างบัญชีเพื่อรับบริการจากแสงดี
       </p>
       <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <SignupForm />
+        <AuthTabs email={<SignupForm />} phone={<PhoneSignupForm />} />
       </div>
     </div>
   );

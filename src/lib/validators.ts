@@ -17,6 +17,37 @@ export const customerSignupSchema = z.object({
 /** Customer login reuses the email+password shape. */
 export const customerLoginSchema = loginSchema;
 
+/** Thai phone number in a local or E.164 form (validated/normalized later). */
+const thaiPhone = z
+  .string()
+  .trim()
+  .min(1, { error: "กรุณากรอกเบอร์โทรศัพท์" })
+  .regex(/^(\+?66|0)\d{8,9}[\s()-]*\d*$/, {
+    error: "กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง เช่น 081-234-5678",
+  });
+
+/** Customer self-registration by phone number (phone + password + SMS OTP). */
+export const phoneSignupSchema = z.object({
+  full_name: z.string().trim().min(1, { error: "กรุณากรอกชื่อ-นามสกุล" }),
+  phone: thaiPhone,
+  password: z.string().min(8, { error: "รหัสผ่านอย่างน้อย 8 ตัวอักษร" }),
+});
+
+/** Verify the 6-digit SMS code sent during phone signup. */
+export const phoneOtpSchema = z.object({
+  phone: thaiPhone,
+  token: z
+    .string()
+    .trim()
+    .regex(/^\d{6}$/, { error: "กรอกรหัส 6 หลักที่ได้รับทาง SMS" }),
+});
+
+/** Customer login by phone number. */
+export const phoneLoginSchema = z.object({
+  phone: thaiPhone,
+  password: z.string().min(1, { error: "กรุณากรอกรหัสผ่าน" }),
+});
+
 /** "Forgot password" — request a reset email. */
 export const forgotPasswordSchema = z.object({
   email: z.email({ error: "กรุณากรอกอีเมลให้ถูกต้อง" }).trim(),

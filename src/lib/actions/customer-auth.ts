@@ -8,8 +8,12 @@ import {
   customerSignupSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
+  phoneSignupSchema,
+  phoneOtpSchema,
+  phoneLoginSchema,
 } from "@/lib/validators";
 import { toFieldErrors, type FormState } from "@/lib/form";
+import { toE164TH } from "@/lib/utils";
 
 /** Only allow same-site relative paths, and never send a customer into /admin. */
 function safeNext(raw: string): string {
@@ -92,6 +96,106 @@ export async function customerLogout() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/");
+}
+
+/** Phone signup step 1: create the account and trigger an SMS OTP. On success
+ *  the client advances to the code-entry step. The DB trigger assigns the
+ *  'customer' role and stores full_name from user metadata (migration 0011). */
+export async function phoneSignup(
+  _prev: FormState,
+  formData: FormData
+): Promise<FormState> {
+  const parsed = phoneSignupSchema.safeParse(
+    Object.fromEntries(formData.entries())
+  );
+  if (!parsed.success) {
+    return { fieldErrors: toFieldErrors(parsed.error) };
+  }
+
+  const phone = toE164TH(parsed.data.phone);
+  if (!phone) {
+    return { fieldErrors: { phone: ["เบอร์โทรศัพท์ไม่ถูกต้อง"] } };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signUp({
+    phone,
+    password: parsed.data.password,
+    options: { data: { full_name: parsed.data.full_name } },
+  });
+
+  if (error) {
+    return {
+      error:
+        "สมัครไม่สำเร็จ — เบอร์นี้อาจถูกใช้แล้ว หรือระบบส่ง SMS ยังไม่พร้อมใช้งาน",
+    };
+  }
+
+  // Success — Supabase sent a 6-digit code by SMS. Echo the normalized phone
+  // back so the verify step knows which number to confirm.
+  return { success: phone };
+}
+
+/** Phone signup step 2: verify the SMS code, which logs the user in. */
+export async function verifyPhoneOtp(
+  _prev: FormState,
+  formData: FormData
+): Promise<FormState> {
+  const parsed = phoneOtpSchema.safeParse(
+    Object.fromEntries(formData.entries())
+  );
+  if (!parsed.success) {
+    return { fieldErrors: toFieldErrors(parsed.error) };
+  }
+
+  const phone = toE164TH(parsed.data.phone);
+  if (!phone) {
+    return { error: "เบอร์โทรศัพท์ไม่ถูกต้อง" };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.verifyOtp({
+    phone,
+    token: parsed.data.token,
+    type: "sms",
+  });
+
+  if (error) {
+    return { error: "รหัสไม่ถูกต้องหรือหมดอายุ กรุณาลองใหม่อีกครั้ง" };
+  }
+
+  redirect("/account");
+}
+
+/** Customer login by phone number + password. */
+export async function phoneLogin(
+  _prev: FormState,
+  formData: FormData
+): Promise<FormState> {
+  const parsed = phoneLoginSchema.safeParse({
+    phone: formData.get("phone"),
+    password: formData.get("password"),
+  });
+  if (!parsed.success) {
+    return { fieldErrors: toFieldErrors(parsed.error) };
+  }
+
+  const phone = toE164TH(parsed.data.phone);
+  if (!phone) {
+    return { fieldErrors: { phone: ["เบอร์โทรศัพท์ไม่ถูกต้อง"] } };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signInWithPassword({
+    phone,
+    password: parsed.data.password,
+  });
+
+  if (error) {
+    return { error: "เบอร์โทรศัพท์หรือรหัสผ่านไม่ถูกต้อง" };
+  }
+
+  redirect(safeNext(String(formData.get("next") ?? "")));
 }
 
 /** Step 1 of reset: email the user a password-reset link. The link lands on

@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/dal";
 import { CustomerLoginForm } from "@/components/site/login-form";
+import { PhoneLoginForm } from "@/components/site/phone-login-form";
+import { AuthTabs } from "@/components/site/auth-tabs";
 
 export const metadata = { title: "เข้าสู่ระบบ — Seangdee" };
 
@@ -25,7 +27,10 @@ export default async function LoginPage({
         ยินดีต้อนรับกลับมา
       </p>
       <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <CustomerLoginForm next={safeNext} />
+        <AuthTabs
+          email={<CustomerLoginForm next={safeNext} />}
+          phone={<PhoneLoginForm next={safeNext} />}
+        />
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { customerLogout } from "@/lib/actions/customer-auth";
+import { formatPhoneTH } from "@/lib/utils";
 import type { Profile } from "@/lib/types";
 
 export const metadata = { title: "บัญชีของฉัน — Seangdee" };
@@ -49,7 +50,10 @@ export default async function AccountPage() {
 
       <div className="mt-8 divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white shadow-sm">
         <Row label="ชื่อ-นามสกุล" value={profile?.full_name || "—"} />
-        <Row label="อีเมล" value={user.email ?? "—"} />
+        <Row label="อีเมล" value={user.email || "—"} />
+        {user.phone && (
+          <Row label="เบอร์โทรศัพท์" value={formatPhoneTH(user.phone)} />
+        )}
         <Row
           label="สมัครเมื่อ"
           value={
