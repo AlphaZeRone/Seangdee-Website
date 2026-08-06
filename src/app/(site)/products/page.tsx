@@ -31,10 +31,14 @@ export default async function ProductsPage({
 
   if (cat) query = query.eq("category_type", cat);
   if (q.trim()) {
-    const term = q.trim();
-    query = query.or(
-      `name_th.ilike.%${term}%,name_en.ilike.%${term}%,sku.ilike.%${term}%,brand_name.ilike.%${term}%`
-    );
+    // Strip characters that are meaningful in PostgREST's or() filter syntax to
+    // avoid filter injection from this public, unauthenticated search input.
+    const term = q.replace(/[%,()*\\]/g, " ").trim();
+    if (term) {
+      query = query.or(
+        `name_th.ilike.%${term}%,name_en.ilike.%${term}%,sku.ilike.%${term}%,brand_name.ilike.%${term}%`
+      );
+    }
   }
 
   const { data } = await query;
