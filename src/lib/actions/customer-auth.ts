@@ -3,7 +3,12 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
-import { customerLoginSchema, customerSignupSchema } from "@/lib/validators";
+import {
+  customerLoginSchema,
+  customerSignupSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+} from "@/lib/validators";
 import { toFieldErrors, type FormState } from "@/lib/form";
 
 /** Only allow same-site relative paths, and never send a customer into /admin. */
@@ -87,4 +92,66 @@ export async function customerLogout() {
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/");
+}
+
+/** Step 1 of reset: email the user a password-reset link. The link lands on
+ *  /auth/callback (which establishes a recovery session) and forwards to
+ *  /reset-password. We ALWAYS report success so we never reveal whether an
+ *  email is registered. */
+export async function requestPasswordReset(
+  _prev: FormState,
+  formData: FormData
+): Promise<FormState> {
+  const parsed = forgotPasswordSchema.safeParse({
+    email: formData.get("email"),
+  });
+  if (!parsed.success) {
+    return { fieldErrors: toFieldErrors(parsed.error) };
+  }
+
+  const supabase = await createClient();
+  const origin = (await headers()).get("origin") ?? "";
+  await supabase.auth.resetPasswordForEmail(parsed.data.email, {
+    redirectTo: `${origin}/auth/callback?next=/reset-password`,
+  });
+
+  return {
+    success:
+      "หากอีเมลนี้มีอยู่ในระบบ เราได้ส่งลิงก์สำหรับตั้งรหัสผ่านใหม่ไปให้แล้ว กรุณาตรวจสอบกล่องจดหมายของคุณ",
+  };
+}
+
+/** Step 2 of reset: set the new password. Requires the recovery session set by
+ *  the callback after the user clicked the email link. */
+export async function updatePassword(
+  _prev: FormState,
+  formData: FormData
+): Promise<FormState> {
+  const parsed = resetPasswordSchema.safeParse({
+    password: formData.get("password"),
+    confirm: formData.get("confirm"),
+  });
+  if (!parsed.success) {
+    return { fieldErrors: toFieldErrors(parsed.error) };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return {
+      error:
+        "ลิงก์รีเซ็ตรหัสผ่านหมดอายุหรือไม่ถูกต้อง กรุณาขอลิงก์ใหม่อีกครั้ง",
+    };
+  }
+
+  const { error } = await supabase.auth.updateUser({
+    password: parsed.data.password,
+  });
+  if (error) {
+    return { error: `ตั้งรหัสผ่านใหม่ไม่สำเร็จ: ${error.message}` };
+  }
+
+  redirect("/account");
 }

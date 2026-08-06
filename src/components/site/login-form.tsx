@@ -36,7 +36,15 @@ export function CustomerLoginForm({ next }: { next?: string }) {
         </div>
 
         <div>
-          <Label htmlFor="password">รหัสผ่าน</Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="password">รหัสผ่าน</Label>
+            <Link
+              href="/forgot-password"
+              className="mb-1 text-xs font-medium text-indigo-600 hover:underline"
+            >
+              ลืมรหัสผ่าน?
+            </Link>
+          </div>
           <Input
             id="password"
             name="password"

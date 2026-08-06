@@ -17,6 +17,22 @@ export const customerSignupSchema = z.object({
 /** Customer login reuses the email+password shape. */
 export const customerLoginSchema = loginSchema;
 
+/** "Forgot password" — request a reset email. */
+export const forgotPasswordSchema = z.object({
+  email: z.email({ error: "กรุณากรอกอีเมลให้ถูกต้อง" }).trim(),
+});
+
+/** Set a new password after clicking the reset link. */
+export const resetPasswordSchema = z
+  .object({
+    password: z.string().min(8, { error: "รหัสผ่านอย่างน้อย 8 ตัวอักษร" }),
+    confirm: z.string().min(1, { error: "กรุณายืนยันรหัสผ่าน" }),
+  })
+  .refine((d) => d.password === d.confirm, {
+    error: "รหัสผ่านไม่ตรงกัน",
+    path: ["confirm"],
+  });
+
 /** Admin changing another user's role on the staff-management page. */
 export const updateUserRoleSchema = z.object({
   userId: z.string().uuid({ error: "ผู้ใช้ไม่ถูกต้อง" }),
