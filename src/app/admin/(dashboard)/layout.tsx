@@ -3,6 +3,7 @@ import { Home } from "lucide-react";
 import { requireStaff } from "@/lib/dal";
 import { logout } from "@/lib/actions/auth";
 import { SidebarNav } from "@/components/admin/sidebar-nav";
+import { AdminMobileNav } from "@/components/admin/mobile-nav";
 
 export default async function DashboardLayout({
   children,
@@ -48,24 +49,12 @@ export default async function DashboardLayout({
       </aside>
 
       <div className="flex-1">
-        {/* Mobile top bar */}
-        <header className="flex items-center justify-between bg-slate-900 px-4 py-3 md:hidden print:hidden">
-          <span className="font-bold text-white">แสงดี · Seangdee</span>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/"
-              className="flex items-center gap-1.5 text-sm text-slate-300"
-            >
-              <Home className="h-4 w-4" />
-              หน้าร้าน
-            </Link>
-            <form action={logout}>
-              <button type="submit" className="text-sm text-slate-300">
-                ออกจากระบบ
-              </button>
-            </form>
-          </div>
-        </header>
+        {/* Mobile top bar + slide-in nav drawer */}
+        <AdminMobileNav
+          isAdmin={profile.role === "admin"}
+          name={profile.full_name}
+          role={profile.role}
+        />
 
         <main className="mx-auto max-w-6xl p-4 md:p-8">{children}</main>
       </div>
