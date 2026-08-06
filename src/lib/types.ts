@@ -135,6 +135,29 @@ export interface StockMovement {
   created_at: string;
 }
 
+/** Customer-facing product, as returned by the `storefront_products` view.
+ *  Deliberately omits cost_price, supplier, reorder level, and exact stock. */
+export interface StorefrontProduct {
+  id: string;
+  sku: string;
+  name_th: string;
+  name_en: string;
+  description_th: string | null;
+  description_en: string | null;
+  sale_price: number;
+  unit: string;
+  image_url: string | null;
+  category_id: string | null;
+  category_name_th: string | null;
+  category_name_en: string | null;
+  category_type: CategoryType | null;
+  category_slug: string | null;
+  brand_id: string | null;
+  brand_name: string | null;
+  in_stock: boolean;
+  created_at: string;
+}
+
 export interface Profile {
   id: string;
   full_name: string;

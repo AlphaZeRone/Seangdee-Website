@@ -38,10 +38,10 @@ export default function HomePage() {
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
-              href="/signup"
+              href="/products"
               className="rounded-lg bg-indigo-600 px-6 py-3 text-sm font-medium text-white hover:bg-indigo-700"
             >
-              สมัครสมาชิก
+              เลือกซื้อสินค้า
             </Link>
             <a
               href="#services"

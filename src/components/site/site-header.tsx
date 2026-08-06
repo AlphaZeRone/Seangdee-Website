@@ -16,6 +16,9 @@ export async function SiteHeader() {
         </Link>
 
         <nav className="hidden items-center gap-6 text-sm text-slate-600 md:flex">
+          <Link href="/products" className="hover:text-slate-900">
+            สินค้า
+          </Link>
           <a href="/#services" className="hover:text-slate-900">
             บริการ
           </a>
