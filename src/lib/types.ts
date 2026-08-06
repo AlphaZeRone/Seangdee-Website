@@ -2,7 +2,11 @@
 
 export type CategoryType = "cctv" | "internet" | "accessory";
 export type ProductStatus = "active" | "inactive";
-export type ProfileRole = "admin" | "staff";
+export type ProfileRole = "admin" | "staff" | "customer" | "pending";
+
+/** Roles an admin may assign on the staff-management page. */
+export const ASSIGNABLE_ROLES = ["admin", "staff", "customer"] as const;
+export type AssignableRole = (typeof ASSIGNABLE_ROLES)[number];
 export type StockReason = "purchase" | "sale" | "adjustment" | "return";
 
 export interface Category {
@@ -137,6 +141,13 @@ export interface Profile {
   role: ProfileRole;
   created_at: string;
 }
+
+export const PROFILE_ROLE_LABELS: Record<ProfileRole, string> = {
+  admin: "ผู้ดูแล (admin)",
+  staff: "พนักงาน (staff)",
+  customer: "ลูกค้า (customer)",
+  pending: "รออนุมัติ (pending)",
+};
 
 export const CATEGORY_TYPE_LABELS: Record<CategoryType, string> = {
   cctv: "กล้องวงจรปิด (CCTV)",

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { customerLogout } from "@/lib/actions/customer-auth";
@@ -20,10 +21,31 @@ export default async function AccountPage() {
     .eq("id", user.id)
     .single<Profile>();
 
+  const isStaff = profile?.role === "admin" || profile?.role === "staff";
+
   return (
     <div className="mx-auto max-w-2xl px-4 py-16">
       <h1 className="text-2xl font-bold text-slate-900">บัญชีของฉัน</h1>
       <p className="mt-1 text-sm text-slate-500">ข้อมูลบัญชีของคุณ</p>
+
+      {isStaff && (
+        <div className="mt-8 flex flex-col gap-3 rounded-2xl border border-indigo-200 bg-indigo-50 p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="font-semibold text-indigo-900">
+              คุณเป็น{profile?.role === "admin" ? "ผู้ดูแลระบบ" : "พนักงาน"}
+            </p>
+            <p className="mt-0.5 text-sm text-indigo-700">
+              เข้าสู่ระบบจัดการร้านเพื่อดูแลสต๊อก บิล และงานหลังบ้าน
+            </p>
+          </div>
+          <Link
+            href="/admin"
+            className="inline-flex shrink-0 items-center justify-center rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-indigo-700"
+          >
+            เข้าสู่ระบบจัดการร้าน →
+          </Link>
+        </div>
+      )}
 
       <div className="mt-8 divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white shadow-sm">
         <Row label="ชื่อ-นามสกุล" value={profile?.full_name || "—"} />

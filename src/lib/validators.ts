@@ -17,6 +17,12 @@ export const customerSignupSchema = z.object({
 /** Customer login reuses the email+password shape. */
 export const customerLoginSchema = loginSchema;
 
+/** Admin changing another user's role on the staff-management page. */
+export const updateUserRoleSchema = z.object({
+  userId: z.string().uuid({ error: "ผู้ใช้ไม่ถูกต้อง" }),
+  role: z.enum(["admin", "staff", "customer"], { error: "บทบาทไม่ถูกต้อง" }),
+});
+
 export const productSchema = z.object({
   sku: z.string().min(1, { error: "กรุณากรอก SKU" }).trim(),
   name_th: z.string().min(1, { error: "กรุณากรอกชื่อสินค้า (ไทย)" }).trim(),

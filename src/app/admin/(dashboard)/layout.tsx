@@ -17,7 +17,7 @@ export default async function DashboardLayout({
           <p className="text-xs text-slate-400">ระบบจัดการสต๊อก</p>
         </div>
 
-        <SidebarNav />
+        <SidebarNav isAdmin={profile.role === "admin"} />
 
         <div className="mt-auto border-t border-slate-800 pt-4">
           <p className="px-2 text-sm text-slate-300">

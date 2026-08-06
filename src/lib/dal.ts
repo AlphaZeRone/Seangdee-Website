@@ -45,3 +45,15 @@ export const requireStaff = cache(async () => {
 
   return { user, profile };
 });
+
+/**
+ * Require an authenticated ADMIN user (stricter than `requireStaff`). Used to
+ * guard staff-management, where a non-admin staff member must NOT be able to
+ * change roles and escalate privileges. A signed-in non-admin is sent to the
+ * admin home, an unauthenticated visitor to the admin login.
+ */
+export const requireAdmin = cache(async () => {
+  const { user, profile } = await requireStaff();
+  if (profile.role !== "admin") redirect("/admin");
+  return { user, profile };
+});

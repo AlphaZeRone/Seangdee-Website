@@ -11,6 +11,7 @@ import {
   Bookmark,
   Truck,
   ShieldCheck,
+  Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -25,12 +26,18 @@ const items = [
   { href: "/admin/suppliers", label: "ผู้จำหน่าย", icon: Truck },
 ];
 
-export function SidebarNav() {
+// Admin-only entries appended when the signed-in user is an admin.
+const adminItems = [
+  { href: "/admin/staff", label: "จัดการทีมงาน", icon: Users, exact: false },
+];
+
+export function SidebarNav({ isAdmin = false }: { isAdmin?: boolean }) {
   const pathname = usePathname();
+  const navItems = isAdmin ? [...items, ...adminItems] : items;
 
   return (
     <nav className="space-y-1">
-      {items.map(({ href, label, icon: Icon, exact }) => {
+      {navItems.map(({ href, label, icon: Icon, exact }) => {
         const active = exact ? pathname === href : pathname.startsWith(href);
         return (
           <Link
