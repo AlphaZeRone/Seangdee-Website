@@ -118,7 +118,7 @@ export async function phoneSignup(
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     phone,
     password: parsed.data.password,
     options: { data: { full_name: parsed.data.full_name } },
@@ -131,8 +131,16 @@ export async function phoneSignup(
     };
   }
 
-  // Success — Supabase sent a 6-digit code by SMS. Echo the normalized phone
-  // back so the verify step knows which number to confirm.
+  // If Supabase phone confirmations are OFF, signUp returns a session right
+  // away — the account is usable immediately, so log them straight in and skip
+  // the SMS step. When confirmations are turned ON (SMS provider connected),
+  // there is no session yet and we fall through to the code-entry step.
+  if (data.session) {
+    redirect("/account");
+  }
+
+  // Confirmations on — Supabase sent a 6-digit code by SMS. Echo the normalized
+  // phone back so the verify step knows which number to confirm.
   return { success: phone };
 }
 

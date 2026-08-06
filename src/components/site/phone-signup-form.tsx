@@ -115,7 +115,7 @@ export function PhoneSignupForm() {
       )}
 
       <Button type="submit" className="w-full" disabled={signupPending}>
-        {signupPending ? "กำลังส่งรหัส…" : "รับรหัส OTP ทาง SMS"}
+        {signupPending ? "กำลังสมัคร…" : "สมัครสมาชิก"}
       </Button>
 
       <p className="text-center text-sm text-slate-500">
