@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { Home } from "lucide-react";
 import { requireStaff } from "@/lib/dal";
 import { logout } from "@/lib/actions/auth";
 import { SidebarNav } from "@/components/admin/sidebar-nav";
@@ -18,6 +20,14 @@ export default async function DashboardLayout({
         </div>
 
         <SidebarNav isAdmin={profile.role === "admin"} />
+
+        <Link
+          href="/"
+          className="mt-4 flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white"
+        >
+          <Home className="h-4 w-4" />
+          กลับหน้าร้าน
+        </Link>
 
         <div className="mt-auto border-t border-slate-800 pt-4">
           <p className="px-2 text-sm text-slate-300">
@@ -41,11 +51,20 @@ export default async function DashboardLayout({
         {/* Mobile top bar */}
         <header className="flex items-center justify-between bg-slate-900 px-4 py-3 md:hidden print:hidden">
           <span className="font-bold text-white">แสงดี · Seangdee</span>
-          <form action={logout}>
-            <button type="submit" className="text-sm text-slate-300">
-              ออกจากระบบ
-            </button>
-          </form>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/"
+              className="flex items-center gap-1.5 text-sm text-slate-300"
+            >
+              <Home className="h-4 w-4" />
+              หน้าร้าน
+            </Link>
+            <form action={logout}>
+              <button type="submit" className="text-sm text-slate-300">
+                ออกจากระบบ
+              </button>
+            </form>
+          </div>
         </header>
 
         <main className="mx-auto max-w-6xl p-4 md:p-8">{children}</main>
