@@ -2,6 +2,13 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/dal";
 import { customerLogout } from "@/lib/actions/customer-auth";
 
+/** Primary nav, shared by the desktop row and the mobile strip below it. */
+const NAV_LINKS = [
+  { href: "/products", label: "สินค้า" },
+  { href: "/about", label: "เกี่ยวกับเรา" },
+  { href: "/contact", label: "ติดต่อเรา" },
+];
+
 export async function SiteHeader() {
   const user = await getCurrentUser();
 
@@ -16,15 +23,11 @@ export async function SiteHeader() {
         </Link>
 
         <nav className="hidden items-center gap-6 text-sm text-slate-600 md:flex">
-          <Link href="/products" className="hover:text-slate-900">
-            สินค้า
-          </Link>
-          <a href="/#services" className="hover:text-slate-900">
-            บริการ
-          </a>
-          <a href="/#contact" className="hover:text-slate-900">
-            ติดต่อเรา
-          </a>
+          {NAV_LINKS.map((l) => (
+            <Link key={l.href} href={l.href} className="hover:text-slate-900">
+              {l.label}
+            </Link>
+          ))}
         </nav>
 
         <div className="flex items-center gap-2">
@@ -63,6 +66,20 @@ export async function SiteHeader() {
           )}
         </div>
       </div>
+
+      {/* Mobile nav strip — the desktop nav above is md:flex, so without this
+          there is no way to reach the main pages on a phone. */}
+      <nav className="flex items-center gap-1 overflow-x-auto border-t border-slate-100 px-4 py-2 text-sm text-slate-600 md:hidden">
+        {NAV_LINKS.map((l) => (
+          <Link
+            key={l.href}
+            href={l.href}
+            className="shrink-0 rounded-full px-3 py-1 hover:bg-slate-100 hover:text-slate-900"
+          >
+            {l.label}
+          </Link>
+        ))}
+      </nav>
     </header>
   );
 }

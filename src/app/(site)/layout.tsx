@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site/site-header";
+import { SHOP, TEL_HREF, LINE_URL } from "@/lib/shop";
 
 export default function SiteLayout({
   children,
@@ -12,17 +13,66 @@ export default function SiteLayout({
       <div className="flex-1">{children}</div>
 
       <footer id="contact" className="border-t border-slate-200 bg-slate-50">
-        <div className="mx-auto grid max-w-6xl gap-6 px-4 py-10 md:grid-cols-2 md:px-8">
+        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:grid-cols-3 md:px-8">
           <div>
             <p className="text-lg font-bold text-slate-900">แสงดี · Seangdee</p>
-            <p className="mt-1 text-sm text-slate-500">
-              ร้านจำหน่ายกล้องวงจรปิดและอุปกรณ์อินเทอร์เน็ต
+            <p className="mt-1 text-sm text-slate-500">{SHOP.tagline_th}</p>
+            <p className="mt-3 text-sm leading-relaxed text-slate-500">
+              {SHOP.address}
             </p>
           </div>
-          <div className="text-sm text-slate-500 md:text-right">
-            <p>โทร: —</p>
-            <p>Line: —</p>
-            <p className="mt-2">
+
+          <div className="text-sm">
+            <p className="font-semibold text-slate-900">เมนู</p>
+            <ul className="mt-2 space-y-1.5 text-slate-500">
+              <li>
+                <Link href="/products" className="hover:text-slate-900">
+                  สินค้า
+                </Link>
+              </li>
+              <li>
+                <Link href="/about" className="hover:text-slate-900">
+                  เกี่ยวกับเรา
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="hover:text-slate-900">
+                  ติดต่อเรา
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div className="text-sm">
+            <p className="font-semibold text-slate-900">ติดต่อ</p>
+            <ul className="mt-2 space-y-1.5 text-slate-500">
+              <li>
+                โทร:{" "}
+                <a href={TEL_HREF} className="hover:text-slate-900">
+                  {SHOP.phone}
+                </a>
+              </li>
+              <li>
+                LINE:{" "}
+                <a
+                  href={LINE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-slate-900"
+                >
+                  {SHOP.line_id}
+                </a>
+              </li>
+              {SHOP.email && (
+                <li>
+                  อีเมล:{" "}
+                  <a href={`mailto:${SHOP.email}`} className="hover:text-slate-900">
+                    {SHOP.email}
+                  </a>
+                </li>
+              )}
+            </ul>
+            <p className="mt-4">
               <Link href="/admin" className="text-slate-400 hover:text-slate-600">
                 เข้าสู่ระบบจัดการ (พนักงาน)
               </Link>

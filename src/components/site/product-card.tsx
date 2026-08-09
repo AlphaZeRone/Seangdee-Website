@@ -1,12 +1,7 @@
 import Link from "next/link";
 import { formatBaht } from "@/lib/utils";
+import { TYPE_LABEL } from "@/lib/storefront";
 import type { StorefrontProduct } from "@/lib/types";
-
-const TYPE_LABEL: Record<string, string> = {
-  cctv: "กล้องวงจรปิด",
-  internet: "อินเทอร์เน็ต",
-  accessory: "อุปกรณ์เสริม",
-};
 
 export function ProductCard({ product }: { product: StorefrontProduct }) {
   return (
