@@ -5,7 +5,6 @@ import { customerLogout } from "@/lib/actions/customer-auth";
 /** Primary nav, shared by the desktop row and the mobile strip below it. */
 const NAV_LINKS = [
   { href: "/products", label: "สินค้า" },
-  { href: "/about", label: "เกี่ยวกับเรา" },
   { href: "/contact", label: "ติดต่อเรา" },
 ];
 

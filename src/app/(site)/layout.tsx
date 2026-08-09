@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site/site-header";
-import { SHOP, TEL_HREF, LINE_URL } from "@/lib/shop";
+import { SHOP, BRANCHES, TEL_HREF, LINE_URL } from "@/lib/shop";
 
 export default function SiteLayout({
   children,
@@ -17,9 +17,17 @@ export default function SiteLayout({
           <div>
             <p className="text-lg font-bold text-slate-900">แสงดี · Seangdee</p>
             <p className="mt-1 text-sm text-slate-500">{SHOP.tagline_th}</p>
-            <p className="mt-3 text-sm leading-relaxed text-slate-500">
-              {SHOP.address}
-            </p>
+            <ul className="mt-3 space-y-2 text-sm leading-relaxed text-slate-500">
+              {BRANCHES.map((b) => (
+                <li key={b.id}>
+                  <span className="font-medium text-slate-700">
+                    สาขา{b.short_th}
+                  </span>
+                  <br />
+                  {b.address}
+                </li>
+              ))}
+            </ul>
           </div>
 
           <div className="text-sm">
@@ -28,11 +36,6 @@ export default function SiteLayout({
               <li>
                 <Link href="/products" className="hover:text-slate-900">
                   สินค้า
-                </Link>
-              </li>
-              <li>
-                <Link href="/about" className="hover:text-slate-900">
-                  เกี่ยวกับเรา
                 </Link>
               </li>
               <li>

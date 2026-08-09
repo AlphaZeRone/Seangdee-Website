@@ -1,18 +1,23 @@
 // Shop identity — the single source of truth for shop details across the site
-// (bills/tax invoices, the About page, the Contact page, and the footer).
+// (bills/tax invoices, the Contact page, and the footer).
 //
 // TODO(owner): replace every value marked PLACEHOLDER below with the real one.
 // Editing this file updates the whole site — no other file needs to change.
 
+/**
+ * The legal/HQ identity of the business. This is what goes on bills and tax
+ * invoices, so it must stay a single set of values even though the shop has
+ * more than one branch — see BRANCHES below for the storefronts.
+ */
 export const SHOP = {
   name_th: "ร้านแสงดี",
   name_en: "Seangdee CCTV & Internet",
   tagline_th: "ร้านจำหน่ายกล้องวงจรปิดและอุปกรณ์อินเทอร์เน็ต",
 
+  /** Head-office address — the one printed on bills/tax invoices. */
   address: "224/1 หมู่ 8 แขวงท่าแร้ง เขตบางเขน กรุงเทพมหานคร 10230",
+  /** Main contact number, used for the site-wide "call us" buttons. */
   phone: "086-789-9635",
-  /** PLACEHOLDER — second line / shop landline. Set to null to hide it. */
-  phone_alt: null as string | null,
   /** PLACEHOLDER — the shop's LINE Official Account id, including the "@". */
   line_id: "@seangdee",
   /** PLACEHOLDER — contact email. Set to null to hide the email row. */
@@ -21,37 +26,84 @@ export const SHOP = {
   facebook_url: null as string | null,
 
   tax_id: "[เลขประจำตัวผู้เสียภาษีของร้าน]",
-
-  /** PLACEHOLDER — the year the shop opened, used in the About copy. */
-  established_year: 2558,
 };
 
-/** Opening hours, shown on the Contact page. PLACEHOLDER — adjust to reality. */
-export const OPENING_HOURS: { days: string; hours: string }[] = [
+export interface OpeningHours {
+  days: string;
+  hours: string;
+}
+
+/** Default opening hours, used by any branch that doesn't override them.
+ *  PLACEHOLDER — adjust to reality. */
+export const DEFAULT_HOURS: OpeningHours[] = [
   { days: "จันทร์ – ศุกร์", hours: "09:00 – 18:00 น." },
   { days: "เสาร์", hours: "09:00 – 17:00 น." },
   { days: "อาทิตย์", hours: "ปิดทำการ" },
 ];
 
+export interface Branch {
+  /** URL-safe id, also used as the React key. */
+  id: string;
+  name_th: string;
+  /** Short label for the branch switcher, e.g. "บางเขน". */
+  short_th: string;
+  address: string;
+  phone: string;
+  hours: OpeningHours[];
+  /** Google Maps `output=embed` URL for the <iframe>. */
+  map_embed_url: string;
+  /** Full Google Maps link, for the "open in Maps" / directions button. */
+  map_link_url: string;
+  /** Optional extra line — landmark, parking, "closed for renovation", etc. */
+  note?: string;
+}
+
 /**
- * Google Maps embed URL for the shop location.
- *
- * TODO(owner): to get the real one — open Google Maps, find the shop, click
- * Share → Embed a map → Copy HTML, then paste ONLY the src="..." value here.
- * Until then this falls back to a search-by-address embed, which lands on the
- * right neighbourhood but not the exact storefront pin.
+ * The physical storefronts. Order matters: the first one is treated as the
+ * main branch and is shown expanded first on /contact.
  */
-export const MAP_EMBED_URL = `https://www.google.com/maps?q=${encodeURIComponent(
-  SHOP.address
-)}&output=embed`;
+export const BRANCHES: Branch[] = [
+  {
+    id: "bangkhen",
+    name_th: "แสงดี · สาขาบางเขน (กรุงเทพฯ)",
+    short_th: "บางเขน",
+    address: SHOP.address,
+    phone: SHOP.phone,
+    hours: DEFAULT_HOURS,
+    // PLACEHOLDER — address-search embed, so it lands on the right
+    // neighbourhood but not the exact storefront pin. To fix: Google Maps →
+    // find the shop → Share → Embed a map → copy only the src="..." value.
+    map_embed_url: `https://www.google.com/maps?q=${encodeURIComponent(
+      SHOP.address
+    )}&output=embed`,
+    map_link_url: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+      SHOP.address
+    )}`,
+  },
+  {
+    id: "nonthaburi",
+    name_th: "แสงดี อิเลคทรอนิคส์ · สาขานนทบุรี",
+    short_th: "นนทบุรี",
+    // TODO(owner): PLACEHOLDER — the exact street address for this branch was
+    // never given; only the map pin. The map below IS correct (exact
+    // coordinates from the shop's own Google Maps listing).
+    address: "[ที่อยู่สาขานนทบุรี — รอข้อมูลจากทางร้าน]",
+    // TODO(owner): PLACEHOLDER — does this branch have its own phone number?
+    // Currently falls back to the main number.
+    phone: SHOP.phone,
+    hours: DEFAULT_HOURS,
+    // Exact pin: 13.9234927, 100.4728669 (from the shop's Maps listing).
+    map_embed_url:
+      "https://www.google.com/maps?q=13.9234927,100.4728669&output=embed",
+    map_link_url: "https://maps.app.goo.gl/h4AmUKbDctbxXmHW9",
+  },
+];
 
-/** Same location, opened in the full Google Maps app/site (for directions). */
-export const MAP_LINK_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-  SHOP.address
-)}`;
+/** `tel:` href built from any display phone number. */
+export const telHref = (phone: string) => `tel:${phone.replace(/[^0-9+]/g, "")}`;
 
-/** `tel:` href built from the display phone number. */
-export const TEL_HREF = `tel:${SHOP.phone.replace(/[^0-9+]/g, "")}`;
+/** `tel:` href for the main shop number. */
+export const TEL_HREF = telHref(SHOP.phone);
 
 /** Deep link that opens the shop's LINE OA chat. */
 export const LINE_URL = `https://line.me/R/ti/p/${encodeURIComponent(SHOP.line_id)}`;
