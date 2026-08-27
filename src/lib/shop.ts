@@ -70,15 +70,12 @@ export const BRANCHES: Branch[] = [
     address: SHOP.address,
     phone: SHOP.phone,
     hours: DEFAULT_HOURS,
-    // PLACEHOLDER — address-search embed, so it lands on the right
-    // neighbourhood but not the exact storefront pin. To fix: Google Maps →
-    // find the shop → Share → Embed a map → copy only the src="..." value.
-    map_embed_url: `https://www.google.com/maps?q=${encodeURIComponent(
-      SHOP.address
-    )}&output=embed`,
-    map_link_url: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-      SHOP.address
-    )}`,
+    // Exact storefront pin: 13.849622391186964, 100.64302826760434
+    // (ซอยรามอินทรา 57 แยก 1, แขวงท่าแร้ง เขตบางเขน กรุงเทพฯ — from the owner).
+    map_embed_url:
+      "https://www.google.com/maps?q=13.849622391186964,100.64302826760434&output=embed",
+    map_link_url:
+      "https://www.google.com/maps/search/?api=1&query=13.849622391186964,100.64302826760434",
   },
   {
     id: "nonthaburi",
@@ -92,10 +89,12 @@ export const BRANCHES: Branch[] = [
     // Currently falls back to the main number.
     phone: SHOP.phone,
     hours: DEFAULT_HOURS,
-    // Exact pin: 13.9234927, 100.4728669 (from the shop's Maps listing).
+    // Exact storefront pin: 13.923659304028536, 100.47290981192833
+    // (ถ.ชัยพฤกษ์ ต.คลองพระอุดม อ.ปากเกร็ด นนทบุรี — from the owner).
     map_embed_url:
-      "https://www.google.com/maps?q=13.9234927,100.4728669&output=embed",
-    map_link_url: "https://maps.app.goo.gl/h4AmUKbDctbxXmHW9",
+      "https://www.google.com/maps?q=13.923659304028536,100.47290981192833&output=embed",
+    map_link_url:
+      "https://www.google.com/maps/search/?api=1&query=13.923659304028536,100.47290981192833",
   },
 ];
 
