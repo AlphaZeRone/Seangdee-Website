@@ -18,14 +18,15 @@ export const SHOP = {
   address: "224/1 หมู่ 8 แขวงท่าแร้ง เขตบางเขน กรุงเทพมหานคร 10230",
   /** Main contact number, used for the site-wide "call us" buttons. */
   phone: "086-789-9635",
-  /** PLACEHOLDER — the shop's LINE Official Account id, including the "@". */
-  line_id: "@seangdee",
-  /** PLACEHOLDER — contact email. Set to null to hide the email row. */
-  email: "contact@seangdee.com" as string | null,
-  /** PLACEHOLDER — Facebook page URL. Set to null to hide it. */
+  /** The shop's LINE id (search by this id to add). */
+  line_id: "0895008008",
+  /** Contact email. null hides the email row everywhere. */
+  email: null as string | null,
+  /** Facebook page URL. Set to null to hide it. */
   facebook_url: null as string | null,
 
-  tax_id: "[เลขประจำตัวผู้เสียภาษีของร้าน]",
+  /** Seller tax id. null hides the "เลขผู้เสียภาษี" line on invoices. */
+  tax_id: null as string | null,
 };
 
 export interface OpeningHours {
@@ -33,11 +34,9 @@ export interface OpeningHours {
   hours: string;
 }
 
-/** Default opening hours, used by any branch that doesn't override them.
- *  PLACEHOLDER — adjust to reality. */
+/** Default opening hours — matches the Bang Khen (main) branch. */
 export const DEFAULT_HOURS: OpeningHours[] = [
-  { days: "จันทร์ – ศุกร์", hours: "09:00 – 18:00 น." },
-  { days: "เสาร์", hours: "09:00 – 17:00 น." },
+  { days: "จันทร์ – เสาร์", hours: "08:00 – 17:30 น." },
   { days: "อาทิตย์", hours: "ปิดทำการ" },
 ];
 
@@ -81,14 +80,13 @@ export const BRANCHES: Branch[] = [
     id: "nonthaburi",
     name_th: "แสงดี อิเลคทรอนิคส์ · สาขานนทบุรี",
     short_th: "นนทบุรี",
-    // TODO(owner): PLACEHOLDER — the exact street address for this branch was
-    // never given; only the map pin. The map below IS correct (exact
-    // coordinates from the shop's own Google Maps listing).
-    address: "[ที่อยู่สาขานนทบุรี — รอข้อมูลจากทางร้าน]",
-    // TODO(owner): PLACEHOLDER — does this branch have its own phone number?
-    // Currently falls back to the main number.
-    phone: SHOP.phone,
-    hours: DEFAULT_HOURS,
+    address:
+      "80/6 หมู่ 5 ถนนชัยพฤกษ์ ตำบลคลองพระอุดม อำเภอปากเกร็ด นนทบุรี 11120",
+    phone: "095-624-1491",
+    hours: [
+      { days: "จันทร์ – เสาร์", hours: "09:00 – 17:00 น." },
+      { days: "อาทิตย์", hours: "ปิดทำการ" },
+    ],
     // Exact storefront pin: 13.923659304028536, 100.47290981192833
     // (ถ.ชัยพฤกษ์ ต.คลองพระอุดม อ.ปากเกร็ด นนทบุรี — from the owner).
     map_embed_url:
@@ -103,6 +101,3 @@ export const telHref = (phone: string) => `tel:${phone.replace(/[^0-9+]/g, "")}`
 
 /** `tel:` href for the main shop number. */
 export const TEL_HREF = telHref(SHOP.phone);
-
-/** Deep link that opens the shop's LINE OA chat. */
-export const LINE_URL = `https://line.me/R/ti/p/${encodeURIComponent(SHOP.line_id)}`;

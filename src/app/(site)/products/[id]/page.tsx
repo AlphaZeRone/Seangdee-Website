@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { formatBaht } from "@/lib/utils";
-import { SHOP, TEL_HREF, LINE_URL } from "@/lib/shop";
+import { SHOP, TEL_HREF } from "@/lib/shop";
 import { ProductCard } from "@/components/site/product-card";
 import { TYPE_LABEL } from "@/lib/storefront";
 import type { StorefrontProduct } from "@/lib/types";
@@ -166,14 +166,9 @@ export default async function ProductDetailPage({
             >
               📞 โทรสั่งซื้อ {SHOP.phone}
             </a>
-            <a
-              href={LINE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-6 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
-            >
-              💬 ทักไลน์
-            </a>
+            <div className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-6 py-3 text-sm font-medium text-slate-700">
+              💬 LINE {SHOP.line_id}
+            </div>
           </div>
           <p className="mt-2 text-xs text-slate-400">
             ยังไม่รองรับการสั่งซื้อออนไลน์ — สอบถามและสั่งซื้อผ่านโทรศัพท์หรือไลน์

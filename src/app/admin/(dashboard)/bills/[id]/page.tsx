@@ -77,7 +77,9 @@ export default async function BillDetailPage({
             <p className="text-sm text-slate-500">{SHOP.name_en}</p>
             <p className="mt-1 text-xs text-slate-500">{SHOP.address}</p>
             <p className="text-xs text-slate-500">โทร {SHOP.phone}</p>
-            <p className="text-xs text-slate-500">เลขผู้เสียภาษี {SHOP.tax_id}</p>
+            {SHOP.tax_id && (
+              <p className="text-xs text-slate-500">เลขผู้เสียภาษี {SHOP.tax_id}</p>
+            )}
           </div>
           <div className="text-right">
             <p className="font-semibold text-slate-900">

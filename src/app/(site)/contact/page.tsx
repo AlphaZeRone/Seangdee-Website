@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { SHOP, BRANCHES, TEL_HREF, LINE_URL, telHref } from "@/lib/shop";
+import { SHOP, BRANCHES, TEL_HREF, telHref } from "@/lib/shop";
 
 export const metadata = {
   title: "ติดต่อเรา — Seangdee",
@@ -19,8 +19,8 @@ const channels = [
     icon: "💬",
     label: "LINE",
     value: SHOP.line_id,
-    href: LINE_URL,
-    hint: "ทักแชทเพื่อขอรูปสินค้า/ใบเสนอราคา",
+    href: null,
+    hint: "แอดไลน์ด้วยเบอร์นี้เพื่อขอรูปสินค้า/ใบเสนอราคา",
   },
   ...(SHOP.email
     ? [
@@ -58,22 +58,34 @@ export default function ContactPage() {
       <div className="mx-auto max-w-6xl px-4 py-14 md:px-8">
         {/* Quick-contact channels */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {channels.map((c) => (
-            <a
-              key={c.label}
-              href={c.href}
-              className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md"
-            >
-              <div className="text-3xl">{c.icon}</div>
-              <p className="mt-4 text-xs font-medium uppercase tracking-wide text-slate-400">
-                {c.label}
-              </p>
-              <p className="mt-1 text-lg font-semibold text-slate-900 group-hover:text-indigo-600">
-                {c.value}
-              </p>
-              <p className="mt-1 text-sm text-slate-500">{c.hint}</p>
-            </a>
-          ))}
+          {channels.map((c) => {
+            const cardClass =
+              "group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition" +
+              (c.href
+                ? " hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md"
+                : "");
+            const inner = (
+              <>
+                <div className="text-3xl">{c.icon}</div>
+                <p className="mt-4 text-xs font-medium uppercase tracking-wide text-slate-400">
+                  {c.label}
+                </p>
+                <p className="mt-1 text-lg font-semibold text-slate-900 group-hover:text-indigo-600">
+                  {c.value}
+                </p>
+                <p className="mt-1 text-sm text-slate-500">{c.hint}</p>
+              </>
+            );
+            return c.href ? (
+              <a key={c.label} href={c.href} className={cardClass}>
+                {inner}
+              </a>
+            ) : (
+              <div key={c.label} className={cardClass}>
+                {inner}
+              </div>
+            );
+          })}
         </div>
 
         {/* Branches */}
@@ -226,14 +238,9 @@ export default function ContactPage() {
           >
             📞 โทร {SHOP.phone}
           </a>
-          <a
-            href={LINE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex w-full items-center justify-center rounded-lg border border-slate-300 bg-white px-6 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 sm:w-auto"
-          >
-            💬 ทักไลน์ {SHOP.line_id}
-          </a>
+          <div className="inline-flex w-full items-center justify-center rounded-lg border border-slate-300 bg-white px-6 py-3 text-sm font-medium text-slate-700 sm:w-auto">
+            💬 LINE: {SHOP.line_id} (แอดด้วยเบอร์)
+          </div>
         </div>
       </div>
     </main>

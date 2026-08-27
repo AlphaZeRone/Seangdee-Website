@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site/site-header";
-import { SHOP, BRANCHES, TEL_HREF, LINE_URL } from "@/lib/shop";
+import { SHOP, BRANCHES, TEL_HREF } from "@/lib/shop";
 
 export default function SiteLayout({
   children,
@@ -57,14 +57,8 @@ export default function SiteLayout({
               </li>
               <li>
                 LINE:{" "}
-                <a
-                  href={LINE_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-slate-900"
-                >
-                  {SHOP.line_id}
-                </a>
+                <span className="text-slate-700">{SHOP.line_id}</span>{" "}
+                <span className="text-xs text-slate-400">(แอดด้วยเบอร์)</span>
               </li>
               {SHOP.email && (
                 <li>
