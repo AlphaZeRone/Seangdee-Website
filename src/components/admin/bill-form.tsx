@@ -4,7 +4,7 @@ import { useActionState, useMemo, useState, type KeyboardEvent } from "react";
 import Link from "next/link";
 import { createBill, updateBill } from "@/lib/actions/bills";
 import { formatBaht } from "@/lib/utils";
-import { Button, Input, Label, Textarea } from "@/components/ui";
+import { Button, Input, Label } from "@/components/ui";
 import type { Product } from "@/lib/types";
 
 type SellProduct = Pick<
@@ -45,7 +45,6 @@ export function BillForm({
   const [selQty, setSelQty] = useState(1);
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
-  const [isTax, setIsTax] = useState(initial?.isTax ?? false);
 
   const byId = useMemo(
     () => new Map(products.map((p) => [p.id, p])),
@@ -129,8 +128,6 @@ export function BillForm({
     (s, l) => s + (byId.get(l.product_id)?.sale_price ?? 0) * l.quantity,
     0
   );
-  const base = total / 1.07;
-  const vat = total - base;
 
   return (
     <form action={formAction} className="space-y-6">
@@ -289,8 +286,6 @@ export function BillForm({
 
       {/* Totals */}
       <div className="ml-auto max-w-xs space-y-1 text-sm">
-        <TotalRow label="ฐานภาษี (ก่อน VAT)" value={formatBaht(base)} />
-        <TotalRow label="VAT 7%" value={formatBaht(vat)} />
         <TotalRow label="ยอดรวมทั้งสิ้น" value={formatBaht(total)} bold />
       </div>
 
@@ -313,39 +308,6 @@ export function BillForm({
           />
         </div>
       </div>
-
-      <label className="flex items-center gap-2 text-sm text-slate-700">
-        <input
-          type="checkbox"
-          name="is_tax_invoice"
-          checked={isTax}
-          onChange={(e) => setIsTax(e.target.checked)}
-          className="h-4 w-4"
-        />
-        ออกใบกำกับภาษี (กรอกที่อยู่และเลขผู้เสียภาษี)
-      </label>
-
-      {isTax && (
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="sm:col-span-2">
-            <Label htmlFor="customer_address">ที่อยู่ลูกค้า</Label>
-            <Textarea
-              id="customer_address"
-              name="customer_address"
-              rows={2}
-              defaultValue={initial?.customer_address ?? ""}
-            />
-          </div>
-          <div>
-            <Label htmlFor="customer_tax_id">เลขประจำตัวผู้เสียภาษี</Label>
-            <Input
-              id="customer_tax_id"
-              name="customer_tax_id"
-              defaultValue={initial?.customer_tax_id ?? ""}
-            />
-          </div>
-        </div>
-      )}
 
       <div>
         <Label htmlFor="note">หมายเหตุ</Label>

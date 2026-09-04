@@ -61,8 +61,6 @@ export async function createProduct(
       brand_id: d.brand_id || null,
       supplier_id: d.supplier_id || null,
       barcode: d.barcode || null,
-      serial_number: d.is_serialized ? null : d.serial_number || null,
-      is_serialized: d.is_serialized,
       cost_price: d.cost_price,
       sale_price: d.sale_price,
       reorder_level: d.reorder_level,
@@ -78,9 +76,8 @@ export async function createProduct(
     return { error: `บันทึกไม่สำเร็จ: ${error?.message ?? "unknown"}` };
   }
 
-  // Serialized products receive their units (with serials) via the stock page,
-  // so skip the plain initial-quantity movement for them.
-  if (!d.is_serialized && d.initial_quantity > 0) {
+  // Record the initial stock as the product's first purchase movement.
+  if (d.initial_quantity > 0) {
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -139,8 +136,6 @@ export async function updateProduct(
       brand_id: d.brand_id || null,
       supplier_id: d.supplier_id || null,
       barcode: d.barcode || null,
-      serial_number: d.is_serialized ? null : d.serial_number || null,
-      is_serialized: d.is_serialized,
       sale_price: d.sale_price,
       reorder_level: d.reorder_level,
       unit: d.unit,

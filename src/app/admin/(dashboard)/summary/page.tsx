@@ -8,8 +8,6 @@ export const metadata = { title: "สรุปยอด — Seangdee Admin" };
 
 interface BillRow {
   id: string;
-  subtotal: number;
-  vat_amount: number;
   total: number;
   created_at: string;
 }
@@ -42,7 +40,7 @@ export default async function SummaryPage({
 
   const { data: billsData } = await supabase
     .from("bills")
-    .select("id, subtotal, vat_amount, total, created_at")
+    .select("id, total, created_at")
     .is("voided_at", null)
     .gte("created_at", range.startISO)
     .lt("created_at", range.endISO)
@@ -62,13 +60,11 @@ export default async function SummaryPage({
   }
 
   const salesTotal = bills.reduce((s, b) => s + Number(b.total), 0);
-  const base = bills.reduce((s, b) => s + Number(b.subtotal), 0);
-  const vatTotal = bills.reduce((s, b) => s + Number(b.vat_amount), 0);
   const cogs = items.reduce(
     (s, i) => s + Number(i.unit_cost_at_sale) * Number(i.quantity),
     0
   );
-  const profit = base - cogs;
+  const profit = salesTotal - cogs;
 
   // Top products by revenue
   const prodMap = new Map<string, { qty: number; revenue: number }>();
@@ -84,8 +80,7 @@ export default async function SummaryPage({
     .slice(0, 5);
 
   // Breakdown rows
-  let breakdown: { label: string; count: number; sales: number; vat: number }[] =
-    [];
+  let breakdown: { label: string; count: number; sales: number }[] = [];
   if (range.bucket === "bill") {
     const timeFmt = new Intl.DateTimeFormat("th-TH", {
       timeStyle: "short",
@@ -95,18 +90,16 @@ export default async function SummaryPage({
       label: timeFmt.format(new Date(b.created_at)),
       count: 1,
       sales: Number(b.total),
-      vat: Number(b.vat_amount),
     }));
   } else {
     const keyOf = (b: BillRow) =>
       range.bucket === "day" ? bkkYmd(b.created_at).d : bkkYmd(b.created_at).m;
-    const m = new Map<string, { count: number; sales: number; vat: number }>();
+    const m = new Map<string, { count: number; sales: number }>();
     for (const b of bills) {
       const k = keyOf(b);
-      const cur = m.get(k) ?? { count: 0, sales: 0, vat: 0 };
+      const cur = m.get(k) ?? { count: 0, sales: 0 };
       cur.count += 1;
       cur.sales += Number(b.total);
-      cur.vat += Number(b.vat_amount);
       m.set(k, cur);
     }
     breakdown = [...m.entries()]
@@ -159,18 +152,17 @@ export default async function SummaryPage({
       </div>
 
       {/* Stat cards */}
-      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat label="ยอดขายรวม (รวม VAT)" value={formatBaht(salesTotal)} />
-        <Stat label="ภาษีมูลค่าเพิ่ม (VAT)" value={formatBaht(vatTotal)} />
+      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Stat label="ยอดขายรวม" value={formatBaht(salesTotal)} />
         <Stat label="ต้นทุนขาย (COGS)" value={formatBaht(cogs)} />
         <Stat
-          label="กำไร (ก่อนภาษี)"
+          label="กำไร"
           value={formatBaht(profit)}
           tone={profit >= 0 ? "green" : "red"}
         />
       </div>
       <p className="-mt-4 mb-8 text-sm text-slate-500">
-        จำนวนบิล {bills.length} · มูลค่าก่อนภาษี {formatBaht(base)}
+        จำนวนบิล {bills.length}
       </p>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -187,13 +179,12 @@ export default async function SummaryPage({
                 </th>
                 <th className="px-5 py-3 text-center">บิล</th>
                 <th className="px-5 py-3 text-right">ยอดขาย</th>
-                <th className="px-5 py-3 text-right">VAT</th>
               </tr>
             </thead>
             <tbody>
               {breakdown.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-5 py-8 text-center text-slate-400">
+                  <td colSpan={3} className="px-5 py-8 text-center text-slate-400">
                     ไม่มีการขายในช่วงนี้
                   </td>
                 </tr>
@@ -205,9 +196,6 @@ export default async function SummaryPage({
                     {r.count}
                   </td>
                   <td className="px-5 py-3 text-right">{formatBaht(r.sales)}</td>
-                  <td className="px-5 py-3 text-right text-slate-500">
-                    {formatBaht(r.vat)}
-                  </td>
                 </tr>
               ))}
             </tbody>

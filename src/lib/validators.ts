@@ -80,7 +80,6 @@ export const productSchema = z.object({
   brand_id: z.string().uuid({ error: "กรุณาเลือกแบรนด์" }).optional().or(z.literal("")),
   supplier_id: z.string().uuid({ error: "กรุณาเลือกผู้จำหน่าย" }).optional().or(z.literal("")),
   barcode: z.string().trim().optional().default(""),
-  serial_number: z.string().trim().optional().default(""),
   sale_price: z.coerce
     .number({ error: "ราคาขายต้องเป็นตัวเลข" })
     .min(0, { error: "ราคาขายต้องไม่ติดลบ" }),
@@ -91,10 +90,6 @@ export const productSchema = z.object({
     .default(0),
   unit: z.string().trim().min(1, { error: "กรุณากรอกหน่วยนับ" }).default("ชิ้น"),
   status: z.enum(["active", "inactive"]).default("active"),
-  is_serialized: z.preprocess(
-    (v) => v === "on" || v === "true" || v === true,
-    z.boolean().default(false)
-  ),
 });
 
 /** Create adds the initial (average) cost and starting quantity, which seed the

@@ -3,21 +3,15 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { setProductStatus } from "@/lib/actions/products";
 import { AddStockForm } from "@/components/admin/add-stock-form";
-import { ReceiveUnitsForm } from "@/components/admin/receive-units-form";
 import { DeleteMovementButton } from "@/components/admin/delete-movement-button";
 import { DeleteProductButton } from "@/components/admin/delete-product-button";
 import { Badge, Button, Card } from "@/components/ui";
 import { formatBaht, formatDateTime } from "@/lib/utils";
 import {
   STOCK_REASON_LABELS,
-  UNIT_STATUS_LABELS,
-  type ProductUnit,
   type ProductWithCategory,
   type StockMovement,
-  type Supplier,
 } from "@/lib/types";
-
-type UnitRow = ProductUnit & { supplier: { id: string; name: string } | null };
 
 export default async function ProductDetailPage({
   params,
@@ -47,23 +41,6 @@ export default async function ProductDetailPage({
   const history = (movements as StockMovement[]) ?? [];
   const low = product.quantity <= product.reorder_level;
 
-  // Serialized products: load their units + suppliers for the receive form.
-  let units: UnitRow[] = [];
-  let suppliers: Supplier[] = [];
-  if (product.is_serialized) {
-    const [{ data: unitData }, { data: supData }] = await Promise.all([
-      supabase
-        .from("product_units")
-        .select("*, supplier:suppliers(id,name)")
-        .eq("product_id", id)
-        .order("received_at", { ascending: false }),
-      supabase.from("suppliers").select("*").order("name"),
-    ]);
-    units = (unitData as UnitRow[]) ?? [];
-    suppliers = (supData as Supplier[]) ?? [];
-  }
-  const inStockUnits = units.filter((u) => u.status === "in_stock").length;
-
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
@@ -77,11 +54,6 @@ export default async function ProductDetailPage({
           <p className="text-sm text-slate-500">
             {product.name_en} · SKU {product.sku}
           </p>
-          {product.is_serialized && (
-            <Badge tone="indigo" className="mt-2">
-              ติดตาม Serial รายชิ้น
-            </Badge>
-          )}
         </div>
         <div className="flex gap-2">
           <Link href={`/admin/products/${product.id}/edit`}>
@@ -124,11 +96,6 @@ export default async function ProductDetailPage({
             <Row label="แบรนด์" value={product.brand?.name ?? "—"} />
             <Row label="ผู้จำหน่าย" value={product.supplier?.name ?? "—"} />
             <Row label="บาร์โค้ด" value={product.barcode ?? "—"} />
-            {product.is_serialized ? (
-              <Row label="Serial" value={`ติดตามรายชิ้น (${units.length})`} />
-            ) : (
-              <Row label="Serial Number" value={product.serial_number ?? "—"} />
-            )}
             <Row label="ราคาทุนเฉลี่ย" value={formatBaht(product.cost_price)} />
             <Row label="ราคาขาย" value={formatBaht(product.sale_price)} />
             <Row label="จุดสั่งซื้อ" value={`${product.reorder_level} ${product.unit}`} />
@@ -151,66 +118,10 @@ export default async function ProductDetailPage({
         <div className="space-y-6 lg:col-span-2">
           <Card>
             <h2 className="mb-3 font-semibold text-slate-800">
-              {product.is_serialized
-                ? "รับเข้าสินค้า (พร้อม Serial)"
-                : "บันทึกการเคลื่อนไหวสต๊อก"}
+              บันทึกการเคลื่อนไหวสต๊อก
             </h2>
-            {product.is_serialized ? (
-              <ReceiveUnitsForm productId={product.id} suppliers={suppliers} />
-            ) : (
-              <AddStockForm productId={product.id} />
-            )}
+            <AddStockForm productId={product.id} />
           </Card>
-
-          {product.is_serialized && (
-            <Card className="overflow-x-auto p-0">
-              <h2 className="border-b border-slate-100 px-5 py-4 font-semibold text-slate-800">
-                รายชิ้น / Serial Units{" "}
-                <span className="text-sm font-normal text-slate-400">
-                  (คงเหลือ {inStockUnits} / {units.length})
-                </span>
-              </h2>
-              <table className="w-full min-w-[520px] text-sm">
-                <thead>
-                  <tr className="border-b border-slate-200 text-left text-xs uppercase text-slate-500">
-                    <th className="px-5 py-3">Serial</th>
-                    <th className="px-5 py-3">ผู้จำหน่าย</th>
-                    <th className="px-5 py-3">รับเข้า</th>
-                    <th className="px-5 py-3">สถานะ</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {units.length === 0 && (
-                    <tr>
-                      <td colSpan={4} className="px-5 py-8 text-center text-slate-400">
-                        ยังไม่มีหน่วยสินค้า — รับเข้าพร้อม Serial ด้านบน
-                      </td>
-                    </tr>
-                  )}
-                  {units.map((u) => (
-                    <tr key={u.id} className="border-b border-slate-100">
-                      <td className="px-5 py-3 font-medium text-slate-800">
-                        {u.serial_number}
-                      </td>
-                      <td className="px-5 py-3 text-slate-500">
-                        {u.supplier?.name ?? "—"}
-                      </td>
-                      <td className="px-5 py-3 text-slate-500">
-                        {formatDateTime(u.received_at)}
-                      </td>
-                      <td className="px-5 py-3">
-                        <Badge
-                          tone={u.status === "in_stock" ? "green" : "gray"}
-                        >
-                          {UNIT_STATUS_LABELS[u.status]}
-                        </Badge>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </Card>
-          )}
 
           <Card className="overflow-x-auto p-0">
             <h2 className="border-b border-slate-100 px-5 py-4 font-semibold text-slate-800">

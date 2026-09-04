@@ -54,34 +54,6 @@ export interface Supplier {
   created_at: string;
 }
 
-export type UnitStatus = "in_stock" | "claimed" | "scrapped";
-
-export interface ProductUnit {
-  id: string;
-  product_id: string;
-  serial_number: string;
-  supplier_id: string | null;
-  unit_cost: number | null;
-  status: UnitStatus;
-  received_at: string;
-  claimed_at: string | null;
-  claim_note: string | null;
-  note: string | null;
-  created_at: string;
-}
-
-/** Unit joined with its product + supplier names (claims lookup). */
-export interface ProductUnitWithRefs extends ProductUnit {
-  product: Pick<Product, "id" | "name_th" | "sku" | "barcode"> | null;
-  supplier: Pick<Supplier, "id" | "name"> | null;
-}
-
-export const UNIT_STATUS_LABELS: Record<UnitStatus, string> = {
-  in_stock: "อยู่ในระบบ",
-  claimed: "เคลมแล้ว",
-  scrapped: "ตัดจำหน่าย",
-};
-
 /** Product joined with its category, brand, and supplier (as returned by list queries). */
 export interface ProductWithCategory extends Product {
   category: Pick<Category, "id" | "name_th" | "name_en" | "type"> | null;

@@ -10,7 +10,6 @@ import {
   Tags,
   Bookmark,
   Truck,
-  ShieldCheck,
   Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -20,7 +19,6 @@ const items = [
   { href: "/admin/bills", label: "บิล / ขาย", icon: Receipt },
   { href: "/admin/summary", label: "สรุปยอด", icon: BarChart3 },
   { href: "/admin/products", label: "สินค้า / สต๊อก", icon: Package },
-  { href: "/admin/claims", label: "เคลมสินค้า", icon: ShieldCheck },
   { href: "/admin/categories", label: "หมวดหมู่", icon: Tags },
   { href: "/admin/brands", label: "แบรนด์", icon: Bookmark },
   { href: "/admin/suppliers", label: "ผู้จำหน่าย", icon: Truck },

@@ -79,14 +79,13 @@ export default async function BillsPage({
               <th className="px-4 py-3">ลูกค้า</th>
               <th className="px-4 py-3">พนักงาน</th>
               <th className="px-4 py-3">ประเภท</th>
-              <th className="px-4 py-3 text-right">VAT</th>
               <th className="px-4 py-3 text-right">รวมทั้งสิ้น</th>
             </tr>
           </thead>
           <tbody>
             {bills.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-10 text-center text-slate-400">
+                <td colSpan={6} className="px-4 py-10 text-center text-slate-400">
                   {q
                     ? "ไม่พบบิลที่ตรงกับคำค้นหา"
                     : "ยังไม่มีบิล — กด “ออกบิลใหม่” เพื่อเริ่มขาย"}
@@ -124,14 +123,9 @@ export default async function BillsPage({
                   <td className="px-4 py-3">
                     {voided ? (
                       <Badge tone="red">ยกเลิก</Badge>
-                    ) : b.is_tax_invoice ? (
-                      <Badge tone="indigo">ใบกำกับภาษี</Badge>
                     ) : (
                       <Badge tone="gray">ใบเสร็จ</Badge>
                     )}
-                  </td>
-                  <td className="px-4 py-3 text-right text-slate-500">
-                    {formatBaht(b.vat_amount)}
                   </td>
                   <td
                     className={`px-4 py-3 text-right font-medium ${

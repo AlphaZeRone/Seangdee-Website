@@ -82,14 +82,8 @@ export default async function BillDetailPage({
             )}
           </div>
           <div className="text-right">
-            <p className="font-semibold text-slate-900">
-              {bill.is_tax_invoice
-                ? "ใบกำกับภาษี / ใบเสร็จรับเงิน"
-                : "ใบเสร็จรับเงิน"}
-            </p>
-            <p className="text-xs text-slate-500">
-              {bill.is_tax_invoice ? "Tax Invoice / Receipt" : "Receipt"}
-            </p>
+            <p className="font-semibold text-slate-900">ใบเสร็จรับเงิน</p>
+            <p className="text-xs text-slate-500">Receipt</p>
             <p className="mt-2 text-sm font-medium text-slate-800">
               เลขที่ {bill.bill_no}
             </p>
@@ -148,14 +142,6 @@ export default async function BillDetailPage({
 
         {/* Totals */}
         <div className="ml-auto max-w-xs space-y-1 text-sm">
-          <div className="flex justify-between text-slate-600">
-            <span>มูลค่าก่อนภาษี</span>
-            <span>{formatBaht(bill.subtotal)}</span>
-          </div>
-          <div className="flex justify-between text-slate-600">
-            <span>ภาษีมูลค่าเพิ่ม {bill.vat_rate}%</span>
-            <span>{formatBaht(bill.vat_amount)}</span>
-          </div>
           <div className="flex justify-between border-t border-slate-300 pt-1 text-base font-bold text-slate-900">
             <span>รวมทั้งสิ้น</span>
             <span>{formatBaht(bill.total)}</span>

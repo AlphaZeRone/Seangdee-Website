@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
 import Link from "next/link";
 import type { Brand, Category, Product, Supplier } from "@/lib/types";
 import { CATEGORY_TYPE_LABELS } from "@/lib/types";
@@ -32,7 +32,6 @@ export function ProductForm({
 }) {
   const [state, formAction, pending] = useActionState(action, undefined);
   const isEdit = Boolean(product);
-  const [serialized, setSerialized] = useState(product?.is_serialized ?? false);
 
   return (
     <form action={formAction} className="space-y-6">
@@ -54,18 +53,6 @@ export function ProductForm({
           />
           <FieldError messages={state?.fieldErrors?.barcode} />
         </div>
-        {!serialized && (
-          <div>
-            <Label htmlFor="serial_number">Serial Number (SN)</Label>
-            <Input
-              id="serial_number"
-              name="serial_number"
-              defaultValue={product?.serial_number ?? ""}
-              placeholder="หมายเลขซีเรียล"
-            />
-            <FieldError messages={state?.fieldErrors?.serial_number} />
-          </div>
-        )}
         <div>
           <Label htmlFor="brand_id">แบรนด์ / Brand</Label>
           <Select
@@ -206,7 +193,7 @@ export function ProductForm({
             <option value="inactive">ปิดการขาย</option>
           </Select>
         </div>
-        {!isEdit && !serialized && (
+        {!isEdit && (
           <div>
             <Label htmlFor="initial_quantity">จำนวนเริ่มต้นในสต๊อก</Label>
             <Input
@@ -222,26 +209,6 @@ export function ProductForm({
           </div>
         )}
       </div>
-
-      {/* Serialized toggle */}
-      <label className="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm">
-        <input
-          type="checkbox"
-          name="is_serialized"
-          checked={serialized}
-          onChange={(e) => setSerialized(e.target.checked)}
-          className="mt-0.5 h-4 w-4"
-        />
-        <span>
-          <span className="font-medium text-slate-800">
-            สินค้ามี Serial Number (ติดตามรายชิ้นเพื่อการเคลม)
-          </span>
-          <span className="mt-0.5 block text-xs text-slate-500">
-            เมื่อเปิดใช้ ให้รับเข้าสินค้าพร้อมกรอก Serial + ผู้จำหน่ายในหน้าสต๊อก —
-            บาร์โค้ดยังใช้ร่วมกันทุกชิ้น ส่วน SN แยกรายชิ้น
-          </span>
-        </span>
-      </label>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
